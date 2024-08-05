@@ -1,0 +1,10 @@
+POST https://fullstackpalautusbackend.onrender.com/api/persons/
+Content-Type: application/json
+
+{
+
+        "name": "Donald Trump",
+        "number": "040-123456",
+        "id": "6"
+      
+}
