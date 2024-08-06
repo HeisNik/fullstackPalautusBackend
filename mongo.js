@@ -30,22 +30,22 @@ const person = new Person({
 
 
 if (argName === undefined) {
-    console.log('Phonebook:')
-    Person
+  console.log('Phonebook:')
+  Person
     .find({})
     .then(persons => {
-        persons.forEach(person => {
-          console.log(`${person.name} ${person.number}`)
-        })
-        mongoose.connection.close()
+      persons.forEach(person => {
+        console.log(`${person.name} ${person.number}`)
       })
-    
+      mongoose.connection.close()
+    })
+
 } else {
 
-person
-.save()
-.then(result => {
-  console.log(`added ${argName} number ${argNumber} to phonebook`)
-  mongoose.connection.close()
-})
+  person
+    .save()
+    .then(() => {
+      console.log(`added ${argName} number ${argNumber} to phonebook`)
+      mongoose.connection.close()
+    })
 }

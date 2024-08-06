@@ -1,12 +1,12 @@
 const validator = (val) => {
-  const number =  val.split("-")
+  const number =  val.split('-')
   if (number.length !== 2) {
-      return false
+    return false
   }
   if (number[0].length > 1 && number[0].length < 4) {
-      return true
+    return true
   } else {
-      return false
+    return false
   }
 }
 
@@ -19,7 +19,7 @@ const url = process.env.MONGODB_URI
 mongoose.set('strictQuery', false)
 console.log('connecting to', url)
 mongoose.connect(url)
-.then(result => {
+  .then(() => {
     console.log('connected to MongoDB')
   })
   .catch((error) => {
