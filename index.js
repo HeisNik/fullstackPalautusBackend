@@ -29,43 +29,13 @@ app.use(morgan((tokens, request, response) => [
 
 
 const Person = require('./models/person')
-
-
-let persons = [
-      {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": "1"
-      },
-      {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": "2"
-      },
-      {
-        "name": "Dan Abramov",
-        "number": "12-43-234345",
-        "id": "3"
-      },
-      {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": "4"
-      },
-      {
-        "name": "Kalle Palander",
-        "number": "39-23-6423122",
-        "id": "5"
-      }
-    ]
-
-
     
-app.get('/api/persons', (request, response) => {
-  Person.find({}).then(persons => {
-    console.log('persons.lenght', persons.length)
+app.get('/api/persons', (request, response, next) => {
+  Person.find({})
+  .then(persons => {
     response.json(persons)
   })
+  .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -80,12 +50,12 @@ app.get('/api/persons/:id', (request, response, next) => {
   .catch(error => next(error))
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
   Person.find({}).then(persons => {
     const time = new Date();
-    console.log(time)
     response.send(`<p>Phonebook has info for ${persons.length} people</p> <p>${time}</p>`)
   })
+  .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -97,34 +67,15 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 
-const generateId = () => {
-  const id = persons.length > 0 
-    ? Math.floor(Math.random() * 100000)
-    : 0
-    console.log('id', id)
-
-    return id.toString()
-}
-
-
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
-    if (!body.name || !body.number) {
+    /*if (!body.name || !body.number) {
       return response.status(400).json({ 
         error: 'name or number missing' 
       })
-    }
+    }*/
     
-    /*
-    const nameInList = persons.find(person => person.name === body.name)
-
-    if (nameInList) {
-      return response.status(400).json({ 
-        error: 'Person is already in the phonebook' 
-      })
-    }
-      */
     
     const person = new Person({
       name: body.name,
@@ -134,17 +85,17 @@ app.post('/api/persons', (request, response) => {
     person.save().then(savedPerson => {
       response.json(savedPerson)
     })
+    .catch(error => next(error))
   })
 
   app.put('/api/persons/:id', (request, response, next) => {
-    const body = request.body
+    const {name, number} = request.body
 
-  const person = {
-    name: body.name,
-    number: body.number 
-  }
-
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+  Person.findByIdAndUpdate(
+    request.params.id,
+     {name, number}, 
+     { new: true, runValidators: true, context: 'query' }
+    )
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
@@ -163,12 +114,13 @@ app.post('/api/persons', (request, response) => {
   
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+      return response.status(400).json({ error: error.message })
     }
   
     next(error)
   }
-  
-  // tämä tulee kaikkien muiden middlewarejen ja routejen rekisteröinnin jälkeen!
+
   app.use(errorHandler)
 
 

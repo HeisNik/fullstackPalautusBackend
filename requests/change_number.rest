@@ -1,7 +1,7 @@
-PUT http://localhost:3001/api/persons/66af778e119c94aa19fc17e5
+PUT http://localhost:3001/api/persons/66b20baa6ca2dc166ceead64
 Content-Type: application/json
 
 {
-        "name": "Eetu Luostarinen",
-        "number": "040-123"       
+        "name": "Donald Draper",
+        "number": "040-123664433"       
 }
